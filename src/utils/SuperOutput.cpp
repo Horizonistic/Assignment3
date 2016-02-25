@@ -1,6 +1,5 @@
 #include "SuperOutput.h"
 #include <iostream>
-#include <fstream>
 
 SuperOutput::SuperOutput(std::string filename)
 {

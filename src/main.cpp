@@ -21,17 +21,33 @@ State checkDigits(char * isbn)
     {
         cout<<*(isbn + i);
 
-        if (i == 1 || i == 11 || i == 5)
+        if (i != ISBN_MAX_LENGTH - 1)
         {
-            if (*(isbn + i) != '-')
+            if (i == 1 || i == 5 || i == 11)
             {
-                state = INVALID;
+                if (*(isbn + i) != '-')
+                {
+                    state = INVALID;
+                }
+            }
+            else
+            {
+                if (((int)*(isbn + i) < 48 || (int)*(isbn + i) > 57))
+                {
+                    state = INVALID;
+                }
+
             }
         }
-
-        if ((*(isbn + i) != 'x' || *(isbn + i) != 'X') || ((int)*(isbn + i) < 48 || (int)*(isbn + i) > 57))
+        else
         {
-            state = INVALID;
+            if (((int)*(isbn + i) < 48 || (int)*(isbn + i) > 57))
+            {
+                if (*(isbn + i) == 'X' || *(isbn + i) == 'x')
+                {
+                    state = VALID;
+                }
+            }
         }
     }
     cout<<endl;

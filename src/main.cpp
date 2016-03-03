@@ -19,8 +19,7 @@ State checkDigits(char * isbn)
 
     for (int i = 0; i < ISBN_MAX_LENGTH; i++)
     {
-        cout<<*(isbn + i);
-
+        cout << *(isbn + i);
         if (i != ISBN_MAX_LENGTH - 1)
         {
             if (i == 1 || i == 5 || i == 11)
@@ -50,20 +49,46 @@ State checkDigits(char * isbn)
             }
         }
     }
-    cout<<endl;
-    if (state == VALID)
-    {
-        return VALID;
-    }
-    else
-    {
-        return INVALID;
-    }
+    cout << endl;
+    return state;
 }
 
 State checkSum(char * isbn)
 {
-    // TODO
+    int sum = 0;
+
+    for (int i = 0, j = 10; i < ISBN_MAX_LENGTH, j > 0; i++, j--)
+    {
+        if (i == 1 || i == 5 || i == 11)
+        {
+            i++;
+        }
+        else
+        {
+            if (*(isbn + 1) == 'x' || *(isbn + 1) == 'X')
+            {
+                sum += 10 * j;
+            }
+            else
+            {
+                sum += ((int)*(isbn + i)) * j;
+            }
+        }
+        cout << sum << ", ";
+    }
+
+    cout << sum << endl << endl;
+
+    if (sum % 11 == 0)
+    {
+        cout << "VALID" << endl;
+        return VALID;
+    }
+    else
+    {
+        cout << "INVALID" << endl;
+        return INVALID;
+    }
 }
 
 void example(SuperOutput * so)
@@ -85,7 +110,16 @@ void example(SuperOutput * so)
         state = checkDigits(examplesPointer);
         if (state == VALID)
         {
-            cout<<"TRUE"<<endl;
+            if (checkSum(examplesPointer) == VALID)
+            {
+                cout << examplesPointer << endl;
+                cout << "TEST" << endl;
+            }
+            else
+            {
+                cout << "TEST2" << endl;
+            }
+
         }
     }
 }

@@ -4,22 +4,25 @@
 #include <iostream>
 #include "utils/SuperOutput.h"
 #include <tr1/regex>
+#include <string.h>
 
 using namespace std;
 
 enum State{VALID, INVALID};
 
 const int ISBN_MAX_LENGTH = 13;
-const int EXAMPLE = -1;
-const int EXIT_PROGRAM = -2;
+const char* EXAMPLE = "example";
+const char* EXIT = "exit";
 
-State checkDigits(char * isbn)
+State checkDigits(SuperOutput * so, char * isbn)
 {
     State state = VALID;
 
     for (int i = 0; i < ISBN_MAX_LENGTH; i++)
     {
-        cout << *(isbn + i);
+        string character(1, *(isbn + i));
+        so->print(character);
+
         if (i != ISBN_MAX_LENGTH - 1)
         {
             if (i == 1 || i == 5 || i == 11)
@@ -49,44 +52,42 @@ State checkDigits(char * isbn)
             }
         }
     }
-    cout << endl;
     return state;
 }
 
 State checkSum(char * isbn)
 {
     int sum = 0;
+    int j = 10;
 
-    for (int i = 0, j = 10; i < ISBN_MAX_LENGTH, j > 0; i++, j--)
+    for (int i = 0; i < ISBN_MAX_LENGTH; i++)
     {
         if (i == 1 || i == 5 || i == 11)
         {
-            i++;
+            continue;
         }
         else
         {
-            if (*(isbn + 1) == 'x' || *(isbn + 1) == 'X')
+            if (*(isbn + i) == 'x' || *(isbn + i) == 'X')
             {
                 sum += 10 * j;
+                j--;
             }
             else
             {
-                sum += ((int)*(isbn + i)) * j;
+                sum += ((int)*(isbn + i) - 48) * j;
+                j--;
             }
         }
-        cout << sum << ", ";
     }
 
-    cout << sum << endl << endl;
 
     if (sum % 11 == 0)
     {
-        cout << "VALID" << endl;
         return VALID;
     }
     else
     {
-        cout << "INVALID" << endl;
         return INVALID;
     }
 }
@@ -105,49 +106,56 @@ void example(SuperOutput * so)
             {'3','-','0','0','1','-','0','0','0','0','a','-','4'}
     };
     for (int i = 0; i < 9; i++) {
-        State state = INVALID;
         char *examplesPointer = exampleISBNs[i];
-        state = checkDigits(examplesPointer);
-        if (state == VALID)
+        if (checkDigits(so, examplesPointer) == VALID)
         {
             if (checkSum(examplesPointer) == VALID)
             {
-                cout << examplesPointer << endl;
-                cout << "TEST" << endl;
+                so->print(" <-- VALID");
             }
-            else
-            {
-                cout << "TEST2" << endl;
-            }
-
         }
+        so->println();
     }
 }
 
 int main()
 {
-    State state = INVALID;
+    int loop = 0;
     SuperOutput * so = new SuperOutput("output.txt");
     char ISBN[ISBN_MAX_LENGTH];
     char *pointerISBN = ISBN;
     example(so);
-/*
-    so->println("Please enter a valid ISBN: ");
-    //cin.getline(pointerISBN, ISBN_MAX_LENGTH + 1);
 
-    for (int i = 0; i < ISBN_MAX_LENGTH; i++)
+    while (loop != -1)
     {
-        *(pointerISBN + i) = (char) (i + 97);
-    }
+        so->println("Please enter a valid ISBN (\"example\" to see examples, or \"exit\" to exit): ");
+        cin.getline(pointerISBN, ISBN_MAX_LENGTH + 1);
 
-    state = checkDigits(pointerISBN);
+        string test("example");
 
-    if (state == VALID)
-    {
-        for (int i = 0; i < ISBN_MAX_LENGTH; i++)
+        loop = (strcmp(pointerISBN, EXAMPLE) == 0) ? 1 : (strcmp(pointerISBN, EXIT) == 0) ? -1 : 0;
+
+        if (loop == 0)
         {
-            cout << *(pointerISBN + i) << endl;
+            if (checkDigits(so, pointerISBN) == VALID)
+            {
+                if (checkSum(pointerISBN) == VALID)
+                {
+                    so->println("That was a valid ISBN number");
+                }
+                else
+                {
+                    so->println("That was a valid ISBN format, but the checksum wasn't correct");
+                }
+            }
+            else
+            {
+                so->println("That was not a valid ISBN format");
+            }
+        }
+        else if (loop == 1)
+        {
+            example(so);
         }
     }
-    */
 }
